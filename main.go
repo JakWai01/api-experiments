@@ -28,6 +28,7 @@ func handleRequests() {
 	r.HandleFunc("/", homepage)
 	r.HandleFunc("/notes", returnAllNotes)
 	r.HandleFunc("/note", createNewNote).Methods("POST")
+	r.HandleFunc("/article/{id}", deleteNote).Methods("DELETE")
 	r.HandleFunc("/notes/{id}", returnSingleNote)
 	log.Fatal(http.ListenAndServe(":10000", r))
 }
@@ -59,6 +60,18 @@ func createNewNote(w http.ResponseWriter, r *http.Request) {
 
 	Notes = append(Notes, note)
 	fmt.Println(w, "%+v", string(reqBody))
+}
+
+func deleteNote(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	for index, note := range Notes {
+
+		if note.Id == id {
+			Notes = append(Notes[:index], Notes[index+1:]...)
+		}
+	}
 }
 
 func main() {
