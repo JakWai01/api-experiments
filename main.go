@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"io/ioutil"
 )
 
 type Note struct {
@@ -22,11 +23,11 @@ func homepage(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleRequests() {
-
 	r := mux.NewRouter().StrictSlash(true)
 
 	r.HandleFunc("/", homepage)
 	r.HandleFunc("/notes", returnAllNotes)
+	r.HandleFunc("/note", createNewNote).Methods("POST")
 	r.HandleFunc("/notes/{id}", returnSingleNote)
 	log.Fatal(http.ListenAndServe(":10000", r))
 }
@@ -47,6 +48,17 @@ func returnSingleNote(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(note)
 		}
 	}
+}
+
+func createNewNote(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("createNewNote")
+
+	reqBody, _ := ioutil.ReadAll(r.Body)
+	var note Note
+	json.Unmarshal(reqBody, &note)
+
+	Notes = append(Notes, note)
+	fmt.Println(w, "%+v", string(reqBody))
 }
 
 func main() {
