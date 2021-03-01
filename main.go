@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"encoding/json"
+	"github.com/gorilla/mux"
 )
 
 type Note struct {
@@ -20,9 +21,12 @@ func homepage(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleRequests() {
-	http.HandleFunc("/", homepage)
-	http.HandleFunc("/notes", returnAllNotes)
-	log.Fatal(http.ListenAndServe(":10000", nil))
+
+	r := mux.NewRouter().StrictSlash(true)
+
+	r.HandleFunc("/", homepage)
+	r.HandleFunc("/notes", returnAllNotes)
+	log.Fatal(http.ListenAndServe(":10000", r))
 }
 
 func returnAllNotes(w http.ResponseWriter, r *http.Request) {
