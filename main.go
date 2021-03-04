@@ -28,7 +28,7 @@ func handleRequests() {
 
 	r.HandleFunc("/", homepage)
 	r.HandleFunc("/notes", returnAllNotes)
-	r.HandleFunc("/note", createNewNote).Methods(http.MethodPost, http.MethodOptions)
+	r.HandleFunc("/note", createNewNote).Methods(http.MethodPost, http.MethodOptions, http.MethodGet, http.MethodDelete, http.MethodPatch, http.MethodPut)
 	r.HandleFunc("/article/{id}", deleteNote).Methods("DELETE")
 	r.HandleFunc("/notes/{id}", returnSingleNote)
 	r.Use(mux.CORSMethodMiddleware(r))
