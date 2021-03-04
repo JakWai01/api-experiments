@@ -10,76 +10,43 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// A Note consists of a title and some content
 type Note struct {
-	Id      string `json:"Id"`
 	Title   string `json:"title"`
 	Content string `json:"content"`
 }
 
+// Notes consists of multiple single Notes
 var Notes []Note
 
 func homepage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello World!")
-	fmt.Println("homepage")
 }
 
 func handleRequests() {
 	r := mux.NewRouter().StrictSlash(true)
 
 	r.HandleFunc("/", homepage)
-	r.HandleFunc("/notes", returnAllNotes)
-	r.HandleFunc("/note", createNewNote).Methods("POST")
-	r.HandleFunc("/article/{id}", deleteNote).Methods("DELETE")
-	r.HandleFunc("/notes/{id}", returnSingleNote)
-	r.Use(mux.CORSMethodMiddleware(r))
+	r.HandleFunc("/notes", requests)
 
 	log.Fatal(http.ListenAndServe(":10000", r))
 }
 
-func returnAllNotes(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("returnAllNotes")
-	json.NewEncoder(w).Encode(Notes)
-}
+func requests(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		json.NewEncoder(w).Encode(Notes)
+	case "POST":
+		reqBody, _ := ioutil.ReadAll(r.Body)
+		var note Note
+		json.Unmarshal(reqBody, &note)
 
-func returnSingleNote(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("returnSingleNote")
-
-	vars := mux.Vars(r)
-	key := vars["id"]
-
-	for _, note := range Notes {
-		if note.Id == key {
-			json.NewEncoder(w).Encode(note)
-		}
-	}
-}
-
-func createNewNote(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("createNewNote")
-
-	reqBody, _ := ioutil.ReadAll(r.Body)
-	var note Note
-	json.Unmarshal(reqBody, &note)
-
-	Notes = append(Notes, note)
-	fmt.Println(w, "%+v", string(reqBody))
-}
-
-func deleteNote(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-
-	for index, note := range Notes {
-
-		if note.Id == id {
-			Notes = append(Notes[:index], Notes[index+1:]...)
-		}
+		Notes = append(Notes, note)
+		fmt.Println(w, "%+v", string(reqBody))
+	default:
 	}
 }
 
 func main() {
-	Notes = []Note{
-		{Id: "1", Title: "Hello World!", Content: "Just another dummy"},
-	}
 	handleRequests()
 }
