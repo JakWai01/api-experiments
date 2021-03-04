@@ -28,8 +28,8 @@ func handleRequests() {
 
 	r.HandleFunc("/", homepage)
 	r.HandleFunc("/notes", returnAllNotes)
-	r.HandleFunc("/note", createNewNote)
-	r.HandleFunc("/article/{id}", deleteNote)
+	r.HandleFunc("/note", createNewNote).Methods("POST")
+	r.HandleFunc("/article/{id}", deleteNote).Methods("DELETE")
 	r.HandleFunc("/notes/{id}", returnSingleNote)
 	r.Use(mux.CORSMethodMiddleware(r))
 
