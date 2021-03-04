@@ -1,17 +1,18 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"encoding/json"
+
 	"github.com/gorilla/mux"
-	"io/ioutil"
 )
 
 type Note struct {
-	Id string `json:"Id"`
-	Title string `json:"title"`
+	Id      string `json:"Id"`
+	Title   string `json:"title"`
 	Content string `json:"content"`
 }
 
@@ -30,6 +31,7 @@ func handleRequests() {
 	r.HandleFunc("/note", createNewNote).Methods("POST")
 	r.HandleFunc("/article/{id}", deleteNote).Methods("DELETE")
 	r.HandleFunc("/notes/{id}", returnSingleNote)
+	r.Use(mux.CORSMethodMiddleware(r))
 	log.Fatal(http.ListenAndServe(":10000", r))
 }
 
@@ -40,7 +42,7 @@ func returnAllNotes(w http.ResponseWriter, r *http.Request) {
 
 func returnSingleNote(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("returnSingleNote")
-	
+
 	vars := mux.Vars(r)
 	key := vars["id"]
 
@@ -52,6 +54,13 @@ func returnSingleNote(w http.ResponseWriter, r *http.Request) {
 }
 
 func createNewNote(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == http.MethodOptions {
+		return
+	}
+
+	w.Write([]byte("note"))
+
 	fmt.Println("createNewNote")
 
 	reqBody, _ := ioutil.ReadAll(r.Body)
