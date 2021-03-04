@@ -19,6 +19,10 @@ type Note struct {
 var Notes []Note
 
 func homepage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == http.MethodOptions {
+		return
+	}
 	fmt.Fprintf(w, "Hello World!")
 	fmt.Println("homepage")
 }
@@ -36,11 +40,19 @@ func handleRequests() {
 }
 
 func returnAllNotes(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == http.MethodOptions {
+		return
+	}
 	fmt.Println("returnAllNotes")
 	json.NewEncoder(w).Encode(Notes)
 }
 
 func returnSingleNote(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == http.MethodOptions {
+		return
+	}
 	fmt.Println("returnSingleNote")
 
 	vars := mux.Vars(r)
@@ -72,6 +84,10 @@ func createNewNote(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteNote(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == http.MethodOptions {
+		return
+	}
 	vars := mux.Vars(r)
 	id := vars["id"]
 
@@ -85,7 +101,7 @@ func deleteNote(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	Notes = []Note{
-		Note{Id: "1", Title: "Hello World!", Content: "Just another dummy"},
+		{Id: "1", Title: "Hello World!", Content: "Just another dummy"},
 	}
 	handleRequests()
 }
