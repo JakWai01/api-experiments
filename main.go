@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -29,14 +30,16 @@ func homepage(w http.ResponseWriter, r *http.Request) {
 
 func handleRequests() {
 	r := mux.NewRouter().StrictSlash(true)
-
+	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
+	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
+	origins := handlers.AllowedOrigins([]string{"*"})
 	r.HandleFunc("/", homepage)
 	r.HandleFunc("/notes", returnAllNotes)
 	r.HandleFunc("/note", createNewNote).Methods(http.MethodPost, http.MethodOptions, http.MethodGet, http.MethodDelete, http.MethodPatch, http.MethodPut)
 	r.HandleFunc("/article/{id}", deleteNote).Methods("DELETE")
 	r.HandleFunc("/notes/{id}", returnSingleNote)
 	r.Use(mux.CORSMethodMiddleware(r))
-	log.Fatal(http.ListenAndServe(":10000", r))
+	log.Fatal(http.ListenAndServe(":10000", handlers.CORS(headers, methods, origins)(r)))
 }
 
 func returnAllNotes(w http.ResponseWriter, r *http.Request) {
