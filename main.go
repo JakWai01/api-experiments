@@ -26,7 +26,7 @@ func homepage(w http.ResponseWriter, r *http.Request) {
 
 func handleRequests() {
 	r := mux.NewRouter().StrictSlash(true)
-	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
+	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization", "Accept", "Accept-Encoding", "Accept-Language", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Cache-Control", "Connection", "Host", "Origin", "Sec-GPC", "User-Agent"})
 	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
 	origins := handlers.AllowedOrigins([]string{"*"})
 
