@@ -20,10 +20,6 @@ type Note struct {
 var Notes []Note
 
 func homepage(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	if r.Method == http.MethodOptions {
-		return
-	}
 	fmt.Fprintf(w, "Hello World!")
 	fmt.Println("homepage")
 }
@@ -33,29 +29,23 @@ func handleRequests() {
 	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
 	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
 	origins := handlers.AllowedOrigins([]string{"*"})
+
 	r.HandleFunc("/", homepage)
 	r.HandleFunc("/notes", returnAllNotes)
-	r.HandleFunc("/note", createNewNote).Methods(http.MethodPost, http.MethodOptions, http.MethodGet, http.MethodDelete, http.MethodPatch, http.MethodPut)
+	r.HandleFunc("/note", createNewNote).Methods("POST")
 	r.HandleFunc("/article/{id}", deleteNote).Methods("DELETE")
 	r.HandleFunc("/notes/{id}", returnSingleNote)
 	r.Use(mux.CORSMethodMiddleware(r))
+
 	log.Fatal(http.ListenAndServe(":10000", handlers.CORS(headers, methods, origins)(r)))
 }
 
 func returnAllNotes(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	if r.Method == http.MethodOptions {
-		return
-	}
 	fmt.Println("returnAllNotes")
 	json.NewEncoder(w).Encode(Notes)
 }
 
 func returnSingleNote(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	if r.Method == http.MethodOptions {
-		return
-	}
 	fmt.Println("returnSingleNote")
 
 	vars := mux.Vars(r)
@@ -69,13 +59,6 @@ func returnSingleNote(w http.ResponseWriter, r *http.Request) {
 }
 
 func createNewNote(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	if r.Method == http.MethodOptions {
-		return
-	}
-
-	w.Write([]byte("note"))
-
 	fmt.Println("createNewNote")
 
 	reqBody, _ := ioutil.ReadAll(r.Body)
@@ -87,10 +70,6 @@ func createNewNote(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteNote(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	if r.Method == http.MethodOptions {
-		return
-	}
 	vars := mux.Vars(r)
 	id := vars["id"]
 
